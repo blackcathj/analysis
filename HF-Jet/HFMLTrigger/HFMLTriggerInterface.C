@@ -11,6 +11,7 @@
 
 #include <g4main/PHG4Hit.h>
 #include <g4main/PHG4Particle.h>
+#include <g4main/PHG4VtxPoint.h>
 #include <g4main/PHG4TruthInfoContainer.h>
 
 #include <g4detectors/PHG4Cell.h>
@@ -415,6 +416,10 @@ int HFMLTriggerInterface::process_event(PHCompositeNode* topNode)
     PHG4Particle* g4particle = iter->second;
     assert(g4particle);
 
+    PHG4VtxPoint* g4vertex =
+    m_truthInfo->GetVtx(g4particle -> get_vtx_id() );
+    assert(g4vertex);
+
     std::set<SvtxCluster*> g4clusters = clustereval->all_clusters_from(g4particle);
 
     //    ptree trackHitTree;
@@ -458,6 +463,11 @@ int HFMLTriggerInterface::process_event(PHCompositeNode* topNode)
                                          g4particle->get_py(),
                                          g4particle->get_pz()),
                           alloc);
+      trackTree.AddMember("TrackOriginPoint",
+          loadCoordinate(g4vertex->get_x(),
+              g4vertex->get_y(),
+              g4vertex->get_z()),
+          alloc);
       //      trackTree.put("TrackDCA3DXY", track->get_dca3d_xy());
       //      trackTree.put("TrackDCA3DZ", track->get_dca3d_z());
 
