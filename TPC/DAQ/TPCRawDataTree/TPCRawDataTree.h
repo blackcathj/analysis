@@ -49,6 +49,10 @@ class TPCRawDataTree : public SubsysReco
     m_includeXYPos = doInclude;
   }
  
+  void setNegativePulseMode(bool negativePulseMode) {
+    m_negativePulseMode = negativePulseMode;
+  }
+  
  protected:
   //! which packet to decode
   std::vector<int> m_packets;
@@ -112,6 +116,8 @@ class TPCRawDataTree : public SubsysReco
 
   int FEE_R[26]={2, 2, 1, 1, 1, 3, 3, 3, 3, 3, 3, 2, 2, 1, 2, 2, 1, 1, 2, 2, 3, 3, 3, 3, 3, 3};
   int FEE_map[26]={4, 5, 0, 2, 1, 11, 9, 10, 8, 7, 6, 0, 1, 3, 7, 6, 5, 4, 3, 2, 0, 2, 1, 3, 5, 4};
+
+  bool m_negativePulseMode = false;
 };
 
 #endif  // TPCRawDataTree_H

@@ -35,6 +35,12 @@ TPCRawDataTree::TPCRawDataTree(const std::string &name)
 //____________________________________________________________________________..
 int TPCRawDataTree::InitRun(PHCompositeNode *)
 {
+  if (m_negativePulseMode)
+  {
+    std::cout << __PRETTY_FUNCTION__ <<" : only waveforms with negative pulse is output" <<std::endl;
+  }
+
+
   sectorNum = m_fname;
   size_t pos = sectorNum.find("TPC_ebdc");
   sectorNum.erase(sectorNum.begin(),sectorNum.begin()+pos+8);
@@ -192,11 +198,14 @@ int TPCRawDataTree::process_event(PHCompositeNode *topNode)
          m_fee == 15){ fillHist=R2_hist; fillHist2D=R2_time;}
       else{ fillHist=R3_hist; fillHist2D=R3_time;}
 
-
+      int minSample = 1024;
       assert(m_nSamples < (int) m_adcSamples.size());  // no need for movements in memory allocation
       for (int s = 0; s < m_nSamples; s++)
       {
         m_adcSamples[s] = p->iValue(wf, s);
+
+        if (minSample>m_adcSamples[s]) minSample = m_adcSamples[s]; 
+
         if(m_checksumError==0){
            fillHist->Fill(m_adcSamples[s]);
            fillHist2D->Fill(s,m_adcSamples[s]);
@@ -231,8 +240,15 @@ int TPCRawDataTree::process_event(PHCompositeNode *topNode)
           m_yPos = 0.;
         }
       }
-      m_SampleTree->Fill();
-    }
+      if (m_negativePulseMode)
+      {
+        if (minSample>=20) continue;
+      }
+      else
+      {
+        m_SampleTree->Fill();
+      }
+    } // for (int wf = 0; wf < m_nWaveormInFrame; wf++)
 
     m_PacketTree->Fill();
   }  //   for (int packet : m_packets)
